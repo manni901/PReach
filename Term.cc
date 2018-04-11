@@ -4,6 +4,7 @@ Term::Term() {
   coef_ = 1.0;
   X_.reset();
   Y_.set();
+  reachable_nodes_.reset();
 }
 
 void Term::Multiply(int edge_index, double p, bool is_present) {
@@ -16,13 +17,9 @@ void Term::Multiply(int edge_index, double p, bool is_present) {
   }
 }
 
-bool Term::Collapse(Nodes end_nodes, EDGE_INFO &edge_terminals) {
-  vector<pair<int, int>> edges;
-  int count;
-  Nodes visited;
-  Nodes copy;
-
-  // Lambda to compute all reachable node gives visited nodes and
+bool Term::Collapse(Edges &mid_edges, Nodes &end_nodes,
+                    EDGE_INFO &edge_terminals, Nodes &reachable_nodes) {
+  // Lambda to compute all reachable node given visited nodes and
   // set of edges present.
   auto edge_visitor = [this, &edge_terminals](Edges &X) -> Nodes {
     vector<pair<int, int>> edges;
@@ -47,21 +44,28 @@ bool Term::Collapse(Nodes end_nodes, EDGE_INFO &edge_terminals) {
     return visited;
   };
 
-  /////FIRST: traverse the x edges and see which end nodes are reachable
+  // FIRST: traverse the x edges and see which end nodes are reachable
   // This is now the set of sure reachable nodes
   Nodes reachable = end_nodes & edge_visitor(X_);
 
-  /////SECOND: traverse all edges except y and see which end nodes are
-  /// unreachable
+  // SECOND: traverse all edges except y and see which end nodes are
+  // unreachable
   Edges all_edges;
   all_edges.set();
   Edges yInverse = all_edges & Y_;
 
   // This is now the set of sure unreachable nodes
-  Nodes unreachable = end_nodes & ~ edge_visitor(yInverse);
+  Nodes unreachable = end_nodes & ~edge_visitor(yInverse);
 
-  /////LAST: if all endNodes are either reachable or unreachable: collapsed
-  /////else (at least one node is neither reachable nor unreachable): doesn't
-  /// collapse
-  return (end_nodes == (reachable | unreachable)) ? true : false;
+  // LAST: if all end_nodes are either reachable or unreachable: collapsed
+  // else (at least one node is neither reachable nor unreachable): doesn't
+  // collapse.
+  if (end_nodes == reachable) {
+    reachable_nodes = reachable;
+    return true;
+  } else if (end_nodes == unreachable) {
+    return true;
+  } else {
+    return false;
+  }
 }

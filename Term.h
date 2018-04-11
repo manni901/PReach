@@ -11,6 +11,11 @@
 
 using namespace std;
 
+struct EdgeInfo {
+    double p;
+    pair<int, int> edge_terminals;
+};
+
 typedef bitset<NUM_EDGES> Edges;
 typedef bitset<NUM_NODES> Nodes;
 typedef unordered_map<int, pair<int, int>> EDGE_INFO;
@@ -34,13 +39,26 @@ private:
 public:
   Term();
 
+  void SetReachableNodes(Nodes &reachable_nodes) {
+    reachable_nodes_ = reachable_nodes;
+  }
+
   // Adds a new edge term to the existing one.
   // The coefficient is updated with p or (1-p) depending on the
   // value of isPresent.
   void Multiply(int edge_index, double p, bool is_present);
 
   // Return true if all end_nodes are reachable
-  bool Collapse(Nodes end_nodes, EDGE_INFO &edge_terminals);
+  bool Collapse(Edges &mid_edges, Nodes &end_nodes, EDGE_INFO &edge_terminals,
+                Nodes &reachable_nodes);
+
+  double GetCoefficient() { return coef_; }
+
+  bool HasReachableNodes() { return reachable_nodes_.any(); }
+
+  void AddCoefficient(double coef) { coef_ += coef; }
+
+  void SetCoefficient(double coef) { coef_ = coef; }
 };
 
 #endif
