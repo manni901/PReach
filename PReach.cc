@@ -713,8 +713,8 @@ int main(int argc, char **argv) {
   CreateGraph(argv[1], g, nNames, nodeMap, wMap);
   int numNodes = countNodes(g);
   int numEdges = countArcs(g);
-  // cout << endl << "Original graph size: " << numNodes << " nodes, " <<
-  // numEdges << " edges" << endl;
+  cout << endl << "Original graph size: " << numNodes << " nodes, " <<
+  numEdges << " edges" << endl;
   cout << numNodes << "  " << numEdges << "  ";
 
   // Read sources and targets and preprocess
@@ -722,8 +722,8 @@ int main(int argc, char **argv) {
 
   numNodes = countNodes(g);
   numEdges = countArcs(g);
-  // cout << endl << "Modified graph size: " << numNodes << " nodes, " <<
-  // numEdges << " edges" << endl << endl;
+  cout << endl << "Modified graph size: " << numNodes << " nodes, " <<
+  numEdges << " edges" << endl << endl;
   cout << numNodes << "  " << numEdges << "  ";
 
   if (numEdges == 0) { // empty graph - source and target unreachable
@@ -756,7 +756,7 @@ int main(int argc, char **argv) {
   }
 
   vector<Cut> cuts;
-  // FindGoodCuts(g, source, target, cuts);
+  //FindGoodCuts(g, source, target, cuts);
   FindSomeGoodCuts(g, source, target, cuts);
 
   unique_ptr<Solver> solver;

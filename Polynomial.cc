@@ -20,7 +20,6 @@ void Polynomial::AddEdge(int edge_index, double p) {
 void Polynomial::Collapse(Edges &mid_edges, Nodes &end_nodes,
                           EDGE_INFO &edge_terminals) {
   vector<Term> new_terms;
-  cout << "Number of terms Before: " << terms_.size() << "\n";
   for (auto &term : terms_) {
     // check collapsing of term
     Nodes z; // will hold the nodes to which the term collapses (Z)
@@ -45,7 +44,7 @@ void Polynomial::Collapse(Edges &mid_edges, Nodes &end_nodes,
     }
   }
   new_terms.swap(terms_); // replace terms with the new collapsed terms
-  cout << "Number of terms: " << terms_.size() << "\n";
+  cout << "Number of terms: " << terms_.size() << " End Terms: " << end_terms_.size() << "\n";
 }
 
 double Polynomial::GetResult() {
