@@ -2,7 +2,6 @@
 #define SOLVER_H
 
 #include "Polynomial.h"
-#include "Term.h"
 
 class Solver {
 public:

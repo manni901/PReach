@@ -2,6 +2,7 @@
 #define SAUSAGE_SOLVER_H
 
 #include "Solver.h"
+#include "Cut.h"
 
 class SausageSolver : public Solver {
 public:

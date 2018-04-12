@@ -1,5 +1,3 @@
-#include "Polynomial.h"
-#include "Term.h"
 #include <fstream>
 #include <lemon/bfs.h>
 #include <lemon/list_graph.h>
@@ -7,6 +5,8 @@
 #include "SausageSolver.h"
 #include "RandomSolver.h"
 #include <memory>
+#include "Cut.h"
+#include "Util.h"
 
 using namespace std;
 using lemon::Bfs;
@@ -617,112 +617,9 @@ void EdgesAsBitset(ListDigraph &g, Edges &edges) {
   }
 }
 
-/*Removes cuts that are obsoleted by cut
-A cut is obsolete if its middle set overlaps with the left set of cut*/
-void RemoveObsoleteCuts(vector<Cut> &cuts, Cut &cut) {
-  for (size_t i = 0; i < cuts.size(); i++) {
-    Cut currentCut = cuts.at(i);
-    if ((currentCut.getMiddle() & cut.getLeft())
-            .any()) { // currentCut is obsolete
-      cuts.erase(cuts.begin() + i);
-      i--;
-    }
-  }
-}
-
-void ConsumeSausage(ListDigraph &g, WeightMap &wMap, Polynomial &poly,
-                    Edges &sausage, Nodes &endNodes) {
-  // Build a dictionary of edgeId -> source and target node ids
-  // Will need it with each collapsation operation within this sausage
-  unordered_map<int, pair<int, int>> edgeTerminals;
-  FOREACH_BS(edgeId, sausage) {
-    pair<int, int> terminals;
-    ListDigraph::Arc arc = g.arcFromId(edgeId);
-    terminals.first = g.id(g.source(arc));
-    terminals.second = g.id(g.target(arc));
-    edgeTerminals[edgeId] = terminals;
-  }
-
-  // start adding the edges in the current sausage
-  // here we collapse after each addition (arbitrary)
-  int edgeCounter = 0;
-  FOREACH_BS(edgeId, sausage) {
-    edgeCounter++;
-    // cout << "Adding edge " << edgeCounter;
-    poly.AddEdge(edgeId, wMap[g.arcFromId(edgeId)]);
-    // cout << ", Collapsing!" << endl;
-    poly.Collapse(sausage, endNodes, edgeTerminals);
-  }
-
-  // Advance the polynomial: make it ready for next sausage
-  poly.Advance();
-}
-
 /*Just for debugging - ignore*/
 bool compareCuts(Cut cut1, Cut cut2) {
   return (cut1.getMiddle().count() < cut2.getMiddle().count());
-}
-
-/*Finds reachability probability given the vertex cuts
-    Starts from the source to the first cut
-    Then removes all the obsolete cuts and pick a next cut
-    An obsolete cut is a cut whose middle set intersects with
-    the left set of the current cut*/
-double Solve(ListDigraph &g, WeightMap &wMap, NameToNode &nodeMap,
-             vector<Cut> &cuts) {
-  // FOR DEBUGGING - REMOVE
-  // sort(cuts.begin(), cuts.end(), compareCuts);
-
-  // set up the source term and start the polynomial
-  ListDigraph::Node source = nodeMap[SOURCE];
-  Nodes zSource, wSource;
-  zSource.set(g.id(source));
-  Polynomial poly(zSource);
-
-  Edges covered; // This will hold the set of covered edges so far
-  Edges sausage; // This will hold the current sausage: edges being considered
-                 // for addition
-
-  // repeat until no cuts left
-  while (cuts.size() > 0) {
-    // select a cut: here we just select the first one (arbitrary)
-    Cut nextCut = cuts.front();
-    // cout << "Available " << cuts.size() << " cuts, Using cut with size " <<
-    // nextCut.size();
-    cout << nextCut.size() << "  ";
-    cuts.erase(cuts.begin());
-    // Identify the sausage: The current set of edges in question
-    sausage = nextCut.getCoveredEdges() & ~covered;
-    // cout << ", Sausage size: " << sausage.count() << endl;
-    cout << sausage.count() << "  ";
-    // Consume the current sausage
-    try {
-      ConsumeSausage(g, wMap, poly, sausage, nextCut.getMiddle());
-    } catch (exception &e) {
-      cout << endl
-           << "EXCEPTION: " << e.what() << ": " << typeid(e).name() << endl;
-      exit(3);
-    }
-    // mark the sausage as covered
-    covered |= sausage;
-    // remove obsolete cuts
-    RemoveObsoleteCuts(cuts, nextCut);
-  }
-
-  // Last: add the edges between the last cut and the target node
-  Edges allEdges; // set of all edges in the network
-  EdgesAsBitset(g, allEdges);
-  sausage = allEdges &
-            ~covered; // the last sausage is all edges that are not yet covered
-  Nodes targetSet;    // The last stop
-  targetSet.set(g.id(nodeMap[SINK]));
-  // cout << "Last step, Sausage size: " << sausage.count() << endl;
-  cout << "1  " << sausage.count() << "  ";
-  ConsumeSausage(g, wMap, poly, sausage, targetSet);
-
-  // RESULT
-  return poly.GetResult();
-  // return -1.0;
 }
 
 string joinString(vector<string> &parts, string delim) {
