@@ -1,0 +1,10 @@
+prefix=/Users/jeeves901/Projects/PReach/lemon
+exec_prefix=/Users/jeeves901/Projects/PReach/lemon/bin
+libdir=/Users/jeeves901/Projects/PReach/lemon/lib
+includedir=/Users/jeeves901/Projects/PReach/lemon/include
+
+Name: LEMON
+Description: Library for Efficient Modeling and Optimization in Networks
+Version: 1.3.1
+Libs: -L${libdir} -lemon     
+Cflags: -I${includedir}

@@ -16,6 +16,8 @@ public:
 
   void Collapse(Edges &mid_edges, Nodes &end_nodes, EDGE_INFO &edge_terminals);
 
+  void Advance();
+
   double GetResult();
 
 private:

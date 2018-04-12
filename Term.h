@@ -11,14 +11,38 @@
 
 using namespace std;
 
+#define FOREACH_BS(v, vSet)	  \
+	for (size_t v=vSet._Find_first(); v!=vSet.size(); v=vSet._Find_next(v))
+
 struct EdgeInfo {
-    double p;
-    pair<int, int> edge_terminals;
+  double p;
+  pair<int, int> edge_terminals;
 };
 
 typedef bitset<NUM_EDGES> Edges;
 typedef bitset<NUM_NODES> Nodes;
 typedef unordered_map<int, pair<int, int>> EDGE_INFO;
+
+/*A class modeling a vertex cut*/
+class Cut {
+  Nodes middle;       // The nodes in the
+  Nodes left;         // Set of nodes on the left
+  Nodes right;        // Set of nodes on the right
+  Edges coveredEdges; // Set of edges covered by this cut (left and middle)
+
+public:
+  Cut() {}
+
+  // consturctor for a specified cut
+  Cut(Nodes &_left, Nodes &_middle, Nodes &_right, Edges &_covered)
+      : left(_left), middle(_middle), right(_right), coveredEdges(_covered) {}
+
+  Nodes &getMiddle() { return middle; }
+  Nodes &getRight() { return right; }
+  Nodes &getLeft() { return left; }
+  Edges &getCoveredEdges() { return coveredEdges; }
+  int size() { return middle.count(); }
+};
 
 // Term respresents a particular subset of the graph
 // with its probability coefficient.

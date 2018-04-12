@@ -20,6 +20,7 @@ void Polynomial::AddEdge(int edge_index, double p) {
 void Polynomial::Collapse(Edges &mid_edges, Nodes &end_nodes,
                           EDGE_INFO &edge_terminals) {
   vector<Term> new_terms;
+  cout << "Number of terms Before: " << terms_.size() << "\n";
   for (auto &term : terms_) {
     // check collapsing of term
     Nodes z; // will hold the nodes to which the term collapses (Z)
@@ -44,24 +45,40 @@ void Polynomial::Collapse(Edges &mid_edges, Nodes &end_nodes,
     }
   }
   new_terms.swap(terms_); // replace terms with the new collapsed terms
+  cout << "Number of terms: " << terms_.size() << "\n";
 }
 
 double Polynomial::GetResult() {
   // SANITY CHECKS
-  vector<Term> terms;
-  for(auto& t : end_terms_) {
-      terms.push_back(t.second);
-  }
-  assert(terms.size() == 2);
-  double totalCoeff = terms.front().GetCoefficient() + terms.back().GetCoefficient();
-  cout << totalCoeff << "\n";
-  //assert(totalCoeff < 1.01 && totalCoeff > 0.99);
+  //assert(terms_.size() == 2);
+  double totalCoeff =
+      terms_.front().GetCoefficient() + terms_.back().GetCoefficient();
+ // assert(totalCoeff < 1.01 && totalCoeff > 0.99);
 
-  if (terms.front().HasReachableNodes()) {
-    assert(!terms.back().HasReachableNodes());
-    return terms.front().GetCoefficient();
+  if (terms_.front().HasReachableNodes()) {
+    //assert(!terms_.back().HasReachableNodes());
+    return terms_.front().GetCoefficient();
   } else {
-    assert(terms.back().HasReachableNodes());
-    return terms.back().GetCoefficient();
+    //assert(terms_.back().HasReachableNodes());
+    return terms_.back().GetCoefficient();
   }
+}
+
+// Advances the polynomial: prepares it for the next cut.
+// Transfers endTerms to terms, and reinitializes endTerms
+void Polynomial::Advance() {
+  // SANITY CHECK
+  //assert(terms_.size() == 0);
+  // copy endTerms to terms
+  terms_ = vector<Term>();
+  double totalCoeff = 0.0;
+  for (auto& term : end_terms_) {
+    totalCoeff += term.second.GetCoefficient();
+    terms_.push_back(term.second);
+  }
+  // reinitialize endTerms
+  end_terms_.clear();
+
+  // SANITY CHECK
+  //assert(totalCoeff < 1.01 && totalCoeff > 0.99);
 }

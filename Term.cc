@@ -23,10 +23,11 @@ bool Term::Collapse(Edges &mid_edges, Nodes &end_nodes,
   // set of edges present.
   auto edge_visitor = [this, &edge_terminals](Edges &X) -> Nodes {
     vector<pair<int, int>> edges;
-    for (int i = 0; i < NUM_EDGES; i++) {
-      if (X[i]) {
+    FOREACH_BS(i, X) {
+    //for (int i = 0; i < NUM_EDGES; i++) {
+      //if (X[i]) {
         edges.push_back(edge_terminals[i]);
-      }
+      //}
     }
     int count = edges.size();
     Nodes visited = reachable_nodes_;
@@ -46,24 +47,23 @@ bool Term::Collapse(Edges &mid_edges, Nodes &end_nodes,
 
   // FIRST: traverse the x edges and see which end nodes are reachable
   // This is now the set of sure reachable nodes
+  Nodes r = edge_visitor(X_);
   Nodes reachable = end_nodes & edge_visitor(X_);
 
   // SECOND: traverse all edges except y and see which end nodes are
   // unreachable
-  Edges all_edges;
-  all_edges.set();
-  Edges yInverse = all_edges & Y_;
+  Edges yInverse = mid_edges & Y_;
 
   // This is now the set of sure unreachable nodes
   Nodes unreachable = end_nodes & ~edge_visitor(yInverse);
 
+  reachable_nodes_ = r;
+
   // LAST: if all end_nodes are either reachable or unreachable: collapsed
   // else (at least one node is neither reachable nor unreachable): doesn't
   // collapse.
-  if (end_nodes == reachable) {
+  if (end_nodes == (reachable | unreachable)) {
     reachable_nodes = reachable;
-    return true;
-  } else if (end_nodes == unreachable) {
     return true;
   } else {
     return false;
