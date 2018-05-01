@@ -1,16 +1,19 @@
 #ifndef SOLVER_H
 #define SOLVER_H
 
+#include "Graph.h"
 #include "Polynomial.h"
 
 class Solver {
 public:
-  Solver(Nodes source, Nodes target, unordered_map<int, EdgeInfo>& edge_info)
-      : source_(source), target_(target), edge_info_(move(edge_info)), P_(Polynomial(source)) {}
+  Solver(Graph &graph)
+      : source_(graph.GetNodeBitset(SOURCE)), P_(Polynomial(source_)) {
+    target_ = graph.GetNodeBitset(SINK);
+    graph.GetEdgeInfo(edge_info_);
+    all_edges_ = graph.EdgesAsBitset();
+  }
 
   virtual double Solve() = 0;
-
-  void SetAllEdges(Edges all_edges) { all_edges_ = all_edges; }
 
 protected:
   Nodes source_;

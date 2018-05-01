@@ -11,6 +11,9 @@
         "deque": "cpp",
         "list": "cpp",
         "__tree": "cpp",
-        "set": "cpp"
+        "set": "cpp",
+        "__functional_03": "cpp",
+        "functional": "cpp",
+        "typeinfo": "cpp"
     }
 }

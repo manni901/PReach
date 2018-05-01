@@ -44,12 +44,13 @@ void Polynomial::Collapse(Edges &mid_edges, Nodes &end_nodes,
     }
   }
   new_terms.swap(terms_); // replace terms with the new collapsed terms
-  cout << "Number of terms: " << terms_.size() << " End Terms: " << end_terms_.size() << "\n";
+  //cout << "Number of terms: " << terms_.size() << " End Terms: " << end_terms_.size() << "\n";
 }
 
 double Polynomial::GetResult() {
   // SANITY CHECKS
   //assert(terms_.size() == 2);
+  cout << "Benching " << terms_.size() << "\n";
   double totalCoeff =
       terms_.front().GetCoefficient() + terms_.back().GetCoefficient();
  // assert(totalCoeff < 1.01 && totalCoeff > 0.99);

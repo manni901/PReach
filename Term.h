@@ -40,6 +40,10 @@ public:
 
   double GetCoefficient() { return coef_; }
 
+  int GetPresentCount() { return X_.count(); }
+
+  int GetAbsentCount() { return Y_.count(); }
+
   bool HasReachableNodes() { return reachable_nodes_.any(); }
 
   void AddCoefficient(double coef) { coef_ += coef; }

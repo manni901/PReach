@@ -3,14 +3,17 @@
 
 #include "Solver.h"
 #include "Cut.h"
+#include "Graph.h"
 
 class SausageSolver : public Solver {
 public:
-  SausageSolver(Nodes &source, Nodes &target,
-                unordered_map<int, EdgeInfo> &edge_info, vector<Cut> &cuts)
-      : Solver(source, target, edge_info), cuts_(move(cuts)) {}
+  SausageSolver(Graph &graph) : Solver(graph) {
+    cuts_ = graph.FindSomeGoodCuts();
+    cout << "Bench 1\n";
+  }
 
   double Solve() {
+  
     Edges covered;
     Edges sausage;
 
@@ -25,13 +28,13 @@ public:
       // Identify the sausage: The current set of edges in question
       sausage = nextCut.getCoveredEdges() & ~covered;
       // cout << ", Sausage size: " << sausage.count() << endl;
-      cout << sausage.count() << "  ";
+      //cout << sausage.count() << "  ";
       // Consume the current sausage
       ConsumeSausage(sausage, nextCut.getMiddle());
       // mark the sausage as covered
       covered |= sausage;
       // remove obsolete cuts
-      RemoveObsoleteCuts(nextCut);
+      cuts_ = nextCut.RemoveObsoleteCuts(cuts_);
     }
 
     sausage = all_edges_ & ~covered;
@@ -40,19 +43,6 @@ public:
     // RESULT
     return P_.GetResult();
     // return -1.0;
-  }
-
-  // Removes cuts that are obsoleted by cut
-  // A cut is obsolete if its middle set overlaps with the left set of cut
-  void RemoveObsoleteCuts(Cut &cut) {
-    for (size_t i = 0; i < cuts_.size(); i++) {
-      Cut currentCut = cuts_.at(i);
-      if ((currentCut.getMiddle() & cut.getLeft())
-              .any()) { // currentCut is obsolete
-        cuts_.erase(cuts_.begin() + i);
-        i--;
-      }
-    }
   }
 
   void ConsumeSausage(Edges& sausage, Nodes& end_nodes) {
@@ -78,7 +68,7 @@ public:
     P_.Advance();
   }
 
-private:
+protected:
   vector<Cut> cuts_;
 };
 

@@ -10,9 +10,7 @@ class RandomSolver : public Solver {
   vector<int> shuffled_edges_;
 
 public:
-  RandomSolver(Nodes &source, Nodes &target,
-               unordered_map<int, EdgeInfo> &edge_info)
-      : Solver(source, target, edge_info) {}
+  RandomSolver(Graph &graph) : Solver(graph) {}
 
   double Solve() {
     Shuffle();
