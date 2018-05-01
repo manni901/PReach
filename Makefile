@@ -1,5 +1,7 @@
 CC = g++ -O3 -Wall -Wextra -std=c++14
 
+LEMON_INCLUDE = -I lemon/include -L lemon/lib
+
 # Points to the root of Google Test, relative to where this file is.
 # Remember to tweak this if you move this file.
 GTEST_DIR = googletest
@@ -58,17 +60,20 @@ Term.o: Term.cc
 Polynomial.o: Polynomial.cc
 	$(CC) -c Polynomial.cc
 
+SausageSolver.o: SausageSolver.cc
+	$(CC) $(LEMON_INCLUDE) -c SausageSolver.cc
+
+SamplingSolver.o: SamplingSolver.cc
+	$(CC) $(LEMON_INCLUDE) -c SamplingSolver.cc
+
 TestRunner.o: TestRunner.cc
 	$(CC) -c TestRunner.cc
 
 Graph.o: Graph.cc
-	$(CC) -I lemon/include -L lemon/lib -c Graph.cc -lemon
+	$(CC) $(LEMON_INCLUDE) -c Graph.cc -lemon
 
-test.out: Term.o Polynomial.o TestRunner.o
-	$(CC) -o test.out Term.o Polynomial.o TestRunner.o
-
-sausage.out: Term.o Polynomial.o Graph.o PReach.cc
-	$(CC) -o sausage.out -I lemon/include -L lemon/lib Term.o Polynomial.o Graph.o PReach.cc -lemon
+main: Term.o Polynomial.o Graph.o SausageSolver.o SamplingSolver.o PReach.cc
+	$(CC) -o $@ $(LEMON_INCLUDE) $^ -lemon
 
 clean:
 	rm -f *.o

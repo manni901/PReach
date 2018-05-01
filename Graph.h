@@ -33,18 +33,7 @@ public:
 
   Graph() : weights_(g_), nodes_(g_) {}
 
-  void CopyFrom(const Graph &graph) {
-    digraphCopy(graph.g_, g_)
-        .arcMap(graph.weights_, weights_)
-        .nodeMap(graph.nodes_, nodes_)
-        .run();
-    for (ListDigraph::NodeIt node(g_); node != INVALID; ++node) {
-      name_to_node_[nodes_[node]] = node;
-    }
-    for (ListDigraph::ArcIt arc(g_); arc != INVALID; ++arc) {
-      edges_.insert(nodes_[g_.source(arc)] + nodes_[g_.target(arc)]);
-    }
-  }
+  void CopyFrom(const Graph &graph);
 
   int CountNodes() { return countNodes(g_); }
 
@@ -62,24 +51,9 @@ public:
   void UpdateWeights(unordered_map<int, double> edge_weights);
 
   // Gets all edges as a bitset.
-  Edges EdgesAsBitset() {
-    Edges edges;
-    for (ListDigraph::ArcIt arc(g_); arc != INVALID; ++arc) {
-      edges.set(g_.id(arc));
-    }
-    return edges;
-  }
+  Edges EdgesAsBitset();
 
-  void GetEdgeInfo(unordered_map<int, EdgeInfo> &edge_info) {
-    for (ListDigraph::ArcIt arc(g_); arc != INVALID; ++arc) {
-      int edgeId = g_.id(arc);
-      pair<int, int> terminals;
-      terminals.first = g_.id(g_.source(arc));
-      terminals.second = g_.id(g_.target(arc));
-      edge_info[edgeId].edge_terminals = terminals;
-      edge_info[edgeId].p = weights_[arc];
-    }
-  }
+  void GetEdgeInfo(unordered_map<int, EdgeInfo> &edge_info);
 
   ListDigraph::Node GetNode(string name);
 
@@ -89,18 +63,9 @@ public:
   // replacing every node by all of its neighbors.
   vector<Cut> FindSomeGoodCuts();
 
-  Nodes GetNodeBitset(string node_name) {
-    Nodes node_bitset;
-    node_bitset.set(g_.id(name_to_node_[node_name]));
-    return node_bitset;
-  }
+  Nodes GetNodeBitset(string node_name);
 
-  void Print() {
-    for (ListDigraph::ArcIt arc(g_); arc != INVALID; ++arc) {
-      cout << g_.id(arc) << "---" << g_.id(g_.source(arc)) << " " << g_.id(g_.target(arc));
-      cout << " " << nodes_[g_.source(arc)] << " " << nodes_[g_.target(arc)] << "\n";
-    }
-  }
+  void Print();
 
 private:
   ListDigraph g_;

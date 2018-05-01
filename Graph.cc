@@ -1,6 +1,53 @@
 #include "Graph.h"
 #include <unordered_set>
 
+void Graph::CopyFrom(const Graph &graph) {
+  digraphCopy(graph.g_, g_)
+      .arcMap(graph.weights_, weights_)
+      .nodeMap(graph.nodes_, nodes_)
+      .run();
+  for (ListDigraph::NodeIt node(g_); node != INVALID; ++node) {
+    name_to_node_[nodes_[node]] = node;
+  }
+  for (ListDigraph::ArcIt arc(g_); arc != INVALID; ++arc) {
+    edges_.insert(nodes_[g_.source(arc)] + nodes_[g_.target(arc)]);
+  }
+}
+
+Edges Graph::EdgesAsBitset() {
+  Edges edges;
+  for (ListDigraph::ArcIt arc(g_); arc != INVALID; ++arc) {
+    edges.set(g_.id(arc));
+  }
+  return edges;
+}
+
+void Graph::GetEdgeInfo(unordered_map<int, EdgeInfo> &edge_info) {
+  for (ListDigraph::ArcIt arc(g_); arc != INVALID; ++arc) {
+    int edgeId = g_.id(arc);
+    pair<int, int> terminals;
+    terminals.first = g_.id(g_.source(arc));
+    terminals.second = g_.id(g_.target(arc));
+    edge_info[edgeId].edge_terminals = terminals;
+    edge_info[edgeId].p = weights_[arc];
+  }
+}
+
+Nodes Graph::GetNodeBitset(string node_name) {
+  Nodes node_bitset;
+  node_bitset.set(g_.id(name_to_node_[node_name]));
+  return node_bitset;
+}
+
+void Graph::Print() {
+  for (ListDigraph::ArcIt arc(g_); arc != INVALID; ++arc) {
+    cout << g_.id(arc) << "---" << g_.id(g_.source(arc)) << " "
+         << g_.id(g_.target(arc));
+    cout << " " << nodes_[g_.source(arc)] << " " << nodes_[g_.target(arc)]
+         << "\n";
+  }
+}
+
 void Graph::AddEdge(string source, string target, double weight) {
   if (edges_.insert(source + target).second) {
     ListDigraph::Arc arc = g_.addArc(GetNode(source), GetNode(target));
@@ -12,11 +59,13 @@ void Graph::UpdateWeights(unordered_map<int, double> edge_weights) {
   for (ListDigraph::ArcIt arc(g_); arc != INVALID; ++arc) {
     string node_source = nodes_[g_.source(arc)];
     string node_target = nodes_[g_.target(arc)];
-    if ( node_source == SOURCE || node_target == SINK) continue;
+    if (node_source == SOURCE || node_target == SINK)
+      continue;
     int edge_id = g_.id(arc);
     auto prob = edge_weights.find(edge_id);
-    if(prob != edge_weights.end()) {
-      if(prob->second > weights_[arc]) weights_[arc] = 1.0;
+    if (prob != edge_weights.end()) {
+      if (prob->second > weights_[arc])
+        weights_[arc] = 1.0;
       else {
         weights_[arc] = 0.0;
         g_.erase(arc);
@@ -75,9 +124,9 @@ void Graph::Create(string &file_name) {
 
 void Graph::Minimize() {
 
-    RemoveIsolatedNodes();
-    CollapseELementaryPaths();
-    RemoveSelfCycles();
+  RemoveIsolatedNodes();
+  CollapseELementaryPaths();
+  RemoveSelfCycles();
 }
 
 void Graph::Preprocess(string sources_file, string targets_file, string pre) {

@@ -50,7 +50,6 @@ void Polynomial::Collapse(Edges &mid_edges, Nodes &end_nodes,
 double Polynomial::GetResult() {
   // SANITY CHECKS
   //assert(terms_.size() == 2);
-  cout << "Benching " << terms_.size() << "\n";
   double totalCoeff =
       terms_.front().GetCoefficient() + terms_.back().GetCoefficient();
  // assert(totalCoeff < 1.01 && totalCoeff > 0.99);

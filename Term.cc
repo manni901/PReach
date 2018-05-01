@@ -24,10 +24,7 @@ bool Term::Collapse(Edges &mid_edges, Nodes &end_nodes,
   auto edge_visitor = [this, &edge_terminals](Edges &X) -> Nodes {
     vector<pair<int, int>> edges;
     FOREACH_BS(i, X) {
-    //for (int i = 0; i < NUM_EDGES; i++) {
-      //if (X[i]) {
-        edges.push_back(edge_terminals[i]);
-      //}
+      edges.push_back(edge_terminals[i]);
     }
     int count = edges.size();
     Nodes visited = reachable_nodes_;
