@@ -3,7 +3,7 @@
 
 namespace {
 TEST(PolynomialTest, AddEdgeTest) {
-  Term poly;
+  Polynomial poly;
   
     EXPECT_EQ ( true, poly.AddEdge(1, 0.2));
 	EXPECT_EQ ( false, poly.AddEdge(1, 0.2));  // Adding the same edge twice 
